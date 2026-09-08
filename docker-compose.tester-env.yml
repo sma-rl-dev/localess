@@ -1,0 +1,16 @@
+services:
+  localess:
+    build: .
+    image: ${IMAGE_TAG:-tester-env-localess:dev}
+    network_mode: bridge
+    ports:
+      - "${PORT:-18184}:5000"
+      - "19099:9099"
+      - "18084:8080"
+      - "19199:9199"
+      - "15001:5001"
+    volumes:
+      - localess-data:/app/firebase-export
+
+volumes:
+  localess-data:

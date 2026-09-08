@@ -41,7 +41,7 @@ export const appConfig: ApplicationConfig = {
         popupRedirectResolver: browserPopupRedirectResolver,
       });
       if (environment.emulator.enabled) {
-        connectAuthEmulator(auth, 'http://localhost:9099', {
+        connectAuthEmulator(auth, `http://${location.hostname}:19099`, {
           disableWarnings: true,
         });
       }
@@ -50,21 +50,21 @@ export const appConfig: ApplicationConfig = {
     provideFirestore(() => {
       const firestore = initializeFirestore(getApp(), { localCache: { kind: 'memory' } });
       if (environment.emulator.enabled) {
-        connectFirestoreEmulator(firestore, 'localhost', 8080);
+        connectFirestoreEmulator(firestore, location.hostname, 18084);
       }
       return firestore;
     }),
     provideStorage(() => {
       const storage = getStorage();
       if (environment.emulator.enabled) {
-        connectStorageEmulator(storage, 'localhost', 9199);
+        connectStorageEmulator(storage, location.hostname, 19199);
       }
       return storage;
     }),
     provideFunctions(() => {
       const functions = getFunctions();
       if (environment.emulator.enabled) {
-        connectFunctionsEmulator(functions, 'localhost', 5001);
+        connectFunctionsEmulator(functions, location.hostname, 15001);
         //functions.customDomain = 'http://localhost:4200/api'
         functions.region = 'europe-west6';
       } else {

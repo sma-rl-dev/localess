@@ -5,7 +5,7 @@ export const environment = {
   firebase: config,
   auth: {
     customDomain: '*',
-    providers: 'GOOGLE,MICROSOFT',
+    providers: '',
   },
   login: {
     message: '',

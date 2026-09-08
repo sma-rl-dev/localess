@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "app": "localess",
+  "requirements": {
+    "admin-email-login": {
+      "status": "present",
+      "evidence": "alex.morgan@northstar.example is an Auth Emulator admin with a fixed password."
+    },
+    "populated-translation-space": {
+      "status": "present",
+      "evidence": "Northstar Product has English, German, and French plus 3 named translation keys."
+    },
+    "populated-content-space": {
+      "status": "present",
+      "evidence": "Northstar Product has the Landing Page schema and two named content documents."
+    }
+  }
+}

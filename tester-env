@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+PORT="18184"
+RUN_ID="${RUN_ID:-default}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+usage() {
+  cat <<'EOF'
+Usage: ./tester-env {deploy|seed|verify|reset|status|logs} [--port PORT] [--run-id ID]
+
+deploy  Build editable source and start Firebase emulators.
+seed    Create deterministic Firebase Auth and Firestore data.
+verify  Check deterministic Firebase Auth and Firestore data.
+reset   Remove only this Compose project's containers and volume.
+status  Show project status, local URL, and emulator ports.
+logs    Follow project logs.
+EOF
+}
+
+while (($# > 1)); do
+  case "$2" in
+    --port) PORT="$3"; shift 2 ;;
+    --run-id) RUN_ID="$3"; shift 2 ;;
+    *) usage; exit 1 ;;
+  esac
+done
+
+PROJECT="tester-env-localess-${RUN_ID}"
+export COMPOSE_PROJECT_NAME="$PROJECT"
+export IMAGE_TAG="${IMAGE_TAG:-tester-env-localess:dev}"
+export PORT
+compose=(docker compose -f "$SCRIPT_DIR/docker-compose.tester-env.yml")
+
+case "${1:-help}" in
+  deploy)
+    echo "==> Building editable source and starting ${PROJECT}"
+    DOCKER_BUILDKIT=1 "${compose[@]}" up --build --detach
+    for _ in {1..60}; do
+      if curl --fail --silent --output /dev/null "http://localhost:${PORT}/"; then
+        echo "==> Ready: http://localhost:${PORT}/"
+        exit 0
+      fi
+      sleep 2
+    done
+    "${compose[@]}" logs
+    exit 1
+    ;;
+  seed|verify)
+    echo "==> ${1^}ing deterministic Localess data"
+    "${compose[@]}" exec -T -e FIREBASE_AUTH_EMULATOR_HOST=127.0.0.1:9099 -e FIRESTORE_EMULATOR_HOST=127.0.0.1:8080 localess node functions/tester-env-data.mjs "$1"
+    ;;
+  reset)
+    echo "==> Removing ${PROJECT} containers and volume"
+    "${compose[@]}" down --volumes --remove-orphans
+    ;;
+  status)
+    "${compose[@]}" ps
+    echo "URL: http://localhost:${PORT}/"
+    echo "Emulators: auth=19099 firestore=18084 storage=19199 functions=15001"
+    ;;
+  logs) "${compose[@]}" logs --follow ;;
+  help|--help|-h) usage ;;
+  *) usage; exit 1 ;;
+esac
