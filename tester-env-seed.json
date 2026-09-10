@@ -13,6 +13,18 @@
     "populated-content-space": {
       "status": "present",
       "evidence": "Northstar Product has the Landing Page schema and two named content documents."
+    },
+    "non-default-locale-available": {
+      "status": "present",
+      "evidence": "Northstar Product space has locales en/de/fr with English fallback; the document editor Select Locale control offers German alongside English."
+    },
+    "nontranslatable-field-present": {
+      "status": "present",
+      "evidence": "Landing Page schema has non-translatable TEXT field 'reference'; Spring Release Notes data.reference is NORTHSTAR-2026 and Pricing Overview data.reference is NORTHSTAR-2026-PRICING."
+    },
+    "nontranslatable-field-value-visible": {
+      "status": "present",
+      "evidence": "The Reference field is a plain TEXT field rendered in the document editor in the default English locale with its seeded value."
     }
   }
 }
