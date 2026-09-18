@@ -25,6 +25,10 @@
     "nontranslatable-field-value-visible": {
       "status": "present",
       "evidence": "The Reference field is a plain TEXT field rendered in the document editor in the default English locale with its seeded value."
+    },
+    "mixed-translation-completion": {
+      "status": "present",
+      "evidence": "navigation.home is fully translated across English, German, and French; pricing.headline (English+German) and release.summary (English-only) are partially translated."
     }
   }
 }
