@@ -7,6 +7,7 @@ const spaceId = 'northstar-product';
 const email = 'alex.morgan@northstar.example';
 const password = 'LocalessSeed!2026';
 const at = Timestamp.fromDate(new Date('2030-01-15T12:00:00Z'));
+const releaseAt = Timestamp.fromDate(new Date('2026-01-15T12:00:00Z'));
 const admin = { name: 'Alex Morgan', email };
 const app = initializeApp({ projectId: 'demo-localess-dev' });
 const auth = getAuth(app);
@@ -71,9 +72,9 @@ const documents = {
     schema: 'landing-page',
     data: { _id: 'release-notes', _schema: 'landing-page', schema: 'landing-page', title: 'Spring release notes', summary: 'A reliable multilingual release summary.', reference: 'NORTHSTAR-2026' },
     updatedBy: admin,
-    publishedAt: at,
-    createdAt: at,
-    updatedAt: at,
+    publishedAt: releaseAt,
+    createdAt: releaseAt,
+    updatedAt: releaseAt,
   },
   [`spaces/${spaceId}/contents/pricing`]: {
     kind: 'DOCUMENT',
@@ -129,6 +130,17 @@ async function verify() {
   ]);
   if (!space.exists || space.data().name !== 'Northstar Product' || translations.size !== 3 || contents.size !== 2 || schemas.size !== 1) {
     throw new Error('seed data is incomplete');
+  }
+  const release = await db.doc(`spaces/${spaceId}/contents/release-notes`).get();
+  const pricing = await db.doc(`spaces/${spaceId}/contents/pricing`).get();
+  const releaseData = release.data();
+  const pricingData = pricing.data();
+  const hasSeededTime = (value, expected) => value instanceof Timestamp && value.isEqual(expected);
+  if (!hasSeededTime(releaseData?.publishedAt, releaseAt) || !hasSeededTime(releaseData?.createdAt, releaseAt) || !hasSeededTime(releaseData?.updatedAt, releaseAt)) {
+    throw new Error('Spring Release Notes timestamps are not the fixed 2026 seed value');
+  }
+  if (!hasSeededTime(pricingData?.createdAt, at) || !hasSeededTime(pricingData?.updatedAt, at) || pricingData?.publishedAt !== undefined) {
+    throw new Error('Pricing Overview timestamps are not the fixed 2030 seed value');
   }
   console.log(`Verified ${email}, Northstar Product, translations=3, contents=2, schemas=1.`);
 }
