@@ -85,8 +85,8 @@ const documents = {
     schema: 'landing-page',
     data: { _id: 'pricing', _schema: 'landing-page', schema: 'landing-page', title: 'Pricing overview', summary: 'Plans for growing product teams.', reference: 'NORTHSTAR-2026-PRICING' },
     updatedBy: admin,
-    createdAt: at,
-    updatedAt: at,
+    createdAt: releaseAt,
+    updatedAt: releaseAt,
   },
   [`spaces/${spaceId}/translations/navigation.home`]: {
     type: 'STRING', locales: { en: 'Home', de: 'Startseite', fr: 'Accueil' }, labels: ['navigation'], description: 'Primary navigation label', updatedBy: admin, createdAt: at, updatedAt: at,
@@ -139,8 +139,8 @@ async function verify() {
   if (!hasSeededTime(releaseData?.publishedAt, releaseAt) || !hasSeededTime(releaseData?.createdAt, releaseAt) || !hasSeededTime(releaseData?.updatedAt, releaseAt)) {
     throw new Error('Spring Release Notes timestamps are not the fixed 2026 seed value');
   }
-  if (!hasSeededTime(pricingData?.createdAt, at) || !hasSeededTime(pricingData?.updatedAt, at) || pricingData?.publishedAt !== undefined) {
-    throw new Error('Pricing Overview timestamps are not the fixed 2030 seed value');
+  if (!hasSeededTime(pricingData?.createdAt, releaseAt) || !hasSeededTime(pricingData?.updatedAt, releaseAt) || pricingData?.publishedAt !== undefined) {
+    throw new Error('Pricing Overview timestamps are not the fixed 2026 seed value');
   }
   console.log(`Verified ${email}, Northstar Product, translations=3, contents=2, schemas=1.`);
 }
