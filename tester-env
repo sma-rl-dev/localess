@@ -18,10 +18,21 @@ logs    Follow project logs.
 EOF
 }
 
-while (($# > 1)); do
-  case "$2" in
-    --port) PORT="$3"; shift 2 ;;
-    --run-id) RUN_ID="$3"; shift 2 ;;
+CMD="${1:-help}"
+if (($# > 0)); then shift; fi
+
+while (($# > 0)); do
+  case "$1" in
+    --port)
+      if (($# < 2)); then usage; exit 1; fi
+      PORT="$2"
+      shift 2
+      ;;
+    --run-id)
+      if (($# < 2)); then usage; exit 1; fi
+      RUN_ID="$2"
+      shift 2
+      ;;
     *) usage; exit 1 ;;
   esac
 done
@@ -32,7 +43,7 @@ export IMAGE_TAG="${IMAGE_TAG:-tester-env-localess:dev}"
 export PORT
 compose=(docker compose -f "$SCRIPT_DIR/docker-compose.tester-env.yml")
 
-case "${1:-help}" in
+case "$CMD" in
   deploy)
     echo "==> Building editable source and starting ${PROJECT}"
     DOCKER_BUILDKIT=1 "${compose[@]}" up --build --detach
@@ -47,8 +58,8 @@ case "${1:-help}" in
     exit 1
     ;;
   seed|verify)
-    echo "==> ${1^}ing deterministic Localess data"
-    "${compose[@]}" exec -T -e FIREBASE_AUTH_EMULATOR_HOST=127.0.0.1:9099 -e FIRESTORE_EMULATOR_HOST=127.0.0.1:8080 localess node functions/tester-env-data.mjs "$1"
+    echo "==> ${CMD^}ing deterministic Localess data"
+    "${compose[@]}" exec -T -e FIREBASE_AUTH_EMULATOR_HOST=127.0.0.1:9099 -e FIRESTORE_EMULATOR_HOST=127.0.0.1:8080 localess node functions/tester-env-data.mjs "$CMD"
     ;;
   reset)
     echo "==> Removing ${PROJECT} containers and volume"
